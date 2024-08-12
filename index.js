@@ -26,15 +26,15 @@ async function main() {
 
     core.debug(`expiration is ${expiration_ttl}`);
 
-    body = await store.get(inputKey);
+    body = (await store.get(inputKey)).value;
     result = true;
     if (body && (body.length > 0 || Object.keys(body).length > 0)) {
       if (overwrite == true) {
         await store.delete(inputKey);
         core.info(`Setting value for ${inputKey} (overwrite: ${overwrite})`);
 
-        body = { value: inputValue }
-        result = await store.set(inputKey, body, expiration_ttl);
+        body = inputValue;
+        result = (await store.set(inputKey, body, expiration_ttl)).value;
       } else {
         core.info(`Getting value for ${inputKey}`);
       }
@@ -45,10 +45,10 @@ async function main() {
       result = await store.set(inputKey, body, expiration_ttl);
     }
 
-    core.info(`value is ${body.value}, result is ${result}`);
+    core.info(`value is ${body}, result is ${result}`);
 
     core.setOutput('result', result);
-    core.setOutput('value', body.value);
+    core.setOutput('value', body);
   } catch (error) {
     core.setFailed(error.message);
     core.setFailed(error.stack);
